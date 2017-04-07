@@ -1,0 +1,83 @@
+//
+//  AppDelegate.m
+//  推送Demo
+//
+//  Created by Lips蔡 on 16/5/24.
+//  Copyright © 2016年 PA. All rights reserved.
+//
+
+#import "AppDelegate.h"
+
+@interface AppDelegate ()
+
+@end
+
+@implementation AppDelegate
+
+// 注册远程推送
+- (void)registerforPushNotificaitons:(UIApplication *)application {
+    UIUserNotificationSettings * notificationSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert categories:nil];
+    [application registerUserNotificationSettings:notificationSettings];
+}
+
+#pragma mark - delegate
+//在这个方法中根据用户的选择：如果是允许通知则会按照前面的步骤创建通知并在一定时间后执行。
+#pragma mark 调用过用户注册通知方法之后执行（也就是调用完registerUserNotificationSettings:方法之后执行）
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
+    
+    if (notificationSettings.types != UIUserNotificationTypeNone) {
+        [application registerForRemoteNotifications];
+    }
+}
+// 获取令牌，此方法发生在注册之后。
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    const char *tokenBytes = deviceToken.bytes;
+    NSString * tokenString;
+    for (int i = 0; i < deviceToken.length; i++) {
+        tokenString = [tokenString stringByAppendingFormat:@"%02x", tokenBytes[i]&0x000000FF];
+    }
+     NSLog(@"%@",tokenString);
+}
+// 查看详细错误信息，此方法发生在获取device token失败之后。
+#pragma mark 获取device token失败后
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+     NSLog(@"%@", error);
+}
+#pragma mark 接收到推送通知之后
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    
+    NSString * netItem = userInfo[@"aps"];
+}
+
+#pragma mark - app 启动
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // Override point for customization after application launch.
+    
+    [self registerforPushNotificaitons:application];
+    
+    return YES;
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+@end
